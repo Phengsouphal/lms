@@ -314,7 +314,11 @@
 <script setup lang="ts">
 import logo from '~/assets/images/logo.png'
 
-import IconDiscount from '~/components/icons/side-bar/IconDiscount.vue'
+import Icon1 from '~/components/icons/side-bar/Icon1.vue'
+import Icon2 from '~/components/icons/side-bar/Icon2.vue'
+import Icon3 from '~/components/icons/side-bar/Icon3.vue'
+import Icon4 from '~/components/icons/side-bar/Icon4.vue'
+
 import IconHome from '~/components/icons/side-bar/IconHome.vue'
 import IconStore from '~/components/icons/side-bar/IconStore.vue'
 import IconOrder from '~/components/icons/side-bar/IconOrder.vue'
@@ -454,25 +458,53 @@ const menuList = () => [
   //   ]
   // },
   {
-    id: '0_7',
-    name: t('sideBar.adminstration'),
-    icon: IconAdmin,
-    route: '',
-    children: [
-      // {
-      //   subId: '0_1',
-      //   permission: 'store:*',
-      //   name: t('sideBar.storeSetting'),
-      //   route: RouteName.STORE_SETTING
-      // },
-      { subId: '0_2', permission: 'user:*', name: t('sideBar.user'), route: RouteName.USER },
-      { subId: '0_3', permission: 'user:*', name: t('Term&Course'), route: RouteName.TERM },
-      { subId: '0_4', permission: 'user:*', name: t('Enrollment'), route: RouteName.ENROLLMENT },
-      { subId: '0_5', permission: 'user:*', name: t('Attendance'), route: RouteName.ATTENDANCE }
-
-      // { subId: '0_3', permission: 'role:*', name: t('sideBar.role'), route: RouteName.ROLE }
-    ]
+    id: '0_1',
+    name: t('User'),
+    icon: Icon1,
+    route: RouteName.USER,
+    children: []
+  },
+  {
+    id: '0_2',
+    name: t('Term&Course'),
+    icon: Icon2,
+    route: RouteName.TERM,
+    children: []
+  },
+  {
+    id: '0_3',
+    name: t('Enrollment'),
+    icon: Icon3,
+    route: RouteName.ENROLLMENT,
+    children: []
+  },
+  {
+    id: '0_4',
+    name: t('Attendance'),
+    icon: Icon4,
+    route: RouteName.ATTENDANCE,
+    children: []
   }
+  // {
+  //   id: '0_7',
+  //   name: t('sideBar.adminstration'),
+  //   icon: IconAdmin,
+  //   route: '',
+  //   children: [
+  //     // {
+  //     //   subId: '0_1',
+  //     //   permission: 'store:*',
+  //     //   name: t('sideBar.storeSetting'),
+  //     //   route: RouteName.STORE_SETTING
+  //     // },
+  //     { subId: '0_2', permission: 'user:*', name: t('sideBar.user'), route: RouteName.USER },
+  //     { subId: '0_3', permission: 'user:*', name: t('Term&Course'), route: RouteName.TERM },
+  //     { subId: '0_4', permission: 'user:*', name: t('Enrollment'), route: RouteName.ENROLLMENT },
+  //     { subId: '0_5', permission: 'user:*', name: t('Attendance'), route: RouteName.ATTENDANCE }
+
+  //     // { subId: '0_3', permission: 'role:*', name: t('sideBar.role'), route: RouteName.ROLE }
+  //   ]
+  // }
 ]
 
 const onCollapse = (e: any) => {

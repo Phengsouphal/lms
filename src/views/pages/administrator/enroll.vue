@@ -394,6 +394,8 @@ const onAddEnrollment = async () => {
       term: termList.value.find((term) => term.id === course?.termId) || null
     })
     formRef.value?.resetFields()
+    formEnrollUser.courseId = ''
+    formEnrollUser.studentId = ''
     showEnrollModal.value = false
   } else {
     Message.warning('This student is already enrolled in this course')
@@ -418,7 +420,6 @@ const handleSelect = (v: any, item: IEnrollment) => {
   } else {
     showDeleteModal.value = true
   }
-  console.log(v, item)
 }
 
 const onConfirmDelete = async () => {

@@ -47,8 +47,6 @@ onMounted(async () => {
     // if (res) {
     //   myProfileStore.myRolePermission = res.permissions
     // }
-
-    console.log(myProfileStore.myRolePermission)
   }
 })
 </script>

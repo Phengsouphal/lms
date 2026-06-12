@@ -379,7 +379,6 @@ const handleSelect = (v: any, item: IUserData) => {
   } else {
     showDeleteModal.value = true
   }
-  console.log(v, item)
 }
 
 const onEditInfo = async () => {

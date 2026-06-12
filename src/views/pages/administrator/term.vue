@@ -12,7 +12,7 @@
 
               <div class="mt-3 text-left">
                 <div
-                  class="p-2 border rounded-full px-4 mb-2"
+                  class="p-2 border cursor-pointer rounded-full px-4 mb-2"
                   :class="[
                     selectedTerm?.id == item.id ? 'border-main bg-main/20' : 'border-gray/40'
                   ]"
@@ -47,7 +47,7 @@
               <p>Courses</p>
               <div class="mt-3 text-left">
                 <div
-                  class="p-2 border rounded-full px-4 mb-2"
+                  class="p-2 border cursor-pointer rounded-full px-4 mb-2"
                   :class="[
                     selectedCourse?.id == item.id ? 'border-main bg-main/20' : 'border-gray/40'
                   ]"
@@ -80,7 +80,7 @@
               <p>Session</p>
               <div class="mt-3 text-left">
                 <div
-                  class="p-2 border rounded-full px-4 mb-2"
+                  class="p-2 border cursor-pointer rounded-full px-4 mb-2"
                   :class="[
                     selectedTerm?.id == item.id ? 'border-main bg-main/20' : 'border-gray/40'
                   ]"
@@ -318,7 +318,6 @@ const selectedCourseList = computed(() => {
     const instructor = userTempStore.userList
       .filter((user) => user.role === EnumUserRole.INSTRUCTOR)
       .find((user) => user.id === course.instructorId)
-    console.log(instructor, '----0-0-', course.instructorId)
     return {
       ...course,
       instructor: instructor
@@ -381,7 +380,6 @@ const onSubmitSession = async () => {
     scheduledAt: '',
     durationMinutes: 0
   })
-  console.log('d3334 3k4 k34 3 k')
   showAddSessionModal.value = false
   formSessionRef.value?.resetFields() // reset session form when course is added
 }

@@ -22,7 +22,15 @@
         <div class="w-full py-4 flex justify-between items-center">
           <div class="w-full flex gap-x-4 justify-between items-start">
             <div class="w-[300px]">
-              <p class="mb-4 text-black">Select a Session</p>
+              <a-select
+                v-model="selectCourse"
+                class="mc-select !w-full !bg-transparent !rounded-md !border-[1.5px] !border-[#d8dce0]"
+              >
+                <a-option :value="item.id" v-for="(item, index) in courseActiveOptions" :key="index"
+                  >{{ item.title }}
+                </a-option>
+              </a-select>
+              <p class="my-4 text-black">Select a Session</p>
               <div
                 class="mb-3 cursor-pointer rounded-md border p-3 border-main text-black"
                 :class="[selectedSession?.id == item.id ? 'bg-main/30' : '']"
@@ -37,8 +45,10 @@
                   {{ getCourseDetails(item.courseId).course?.title }}
                 </p>
                 <p class="text-[10px] text-left">
-                  {{ getCountAttendance(item?.id) || 0 }}/{{ getCountStu(item?.courseId) || 0 }}
-                  record
+                  {{ getCountAttendance(item?.id) || 0 }}/{{
+                    getCountStu(item?.courseId) || 0
+                  }}
+                  record <span>{{}}</span>
                 </p>
               </div>
             </div>
@@ -49,10 +59,16 @@
                 {{ selectedSession.title }}
               </p>
               <div class="mb-4 flex text-[10px] justify-start gap-x-2 items-center capitalize">
-                <p class="text-success px-3 py-1 rounded-full bg-success/30">present</p>
-                <p class="text-danger px-3 py-1 rounded-full bg-danger/30">absent</p>
-                <p class="text-warning px-3 py-1 rounded-full bg-warning/30">late</p>
-                <p class="text-gray px-3 py-1 rounded-full bg-gray/30">excused</p>
+                <p class="text-success px-3 py-1 rounded-full bg-success/30">
+                  {{ countPresent }} present
+                </p>
+                <p class="text-danger px-3 py-1 rounded-full bg-danger/30">
+                  {{ countAbsent }} absent
+                </p>
+                <p class="text-warning px-3 py-1 rounded-full bg-warning/30">
+                  {{ countLate }} late
+                </p>
+                <p class="text-gray px-3 py-1 rounded-full bg-gray/30">{{ countExcuse }} excused</p>
               </div>
               <div v-if="selectedSession" class="w-full">
                 <div v-if="studentEnrollList.length == 0 && !loadingList">
@@ -138,7 +154,7 @@
                 </a-skeleton>
               </div>
               <div class="w-full flex justify-end items-center">
-                <!-- <a-button @click="saveAttendance">Save Attendance</a-button> -->
+                <a-button @click="saveAttendance">Save Attendance</a-button>
               </div>
             </div>
           </div>
@@ -163,6 +179,7 @@ import {
 import { storeToRefs } from 'pinia'
 import { v4 } from 'uuid'
 import { sleep } from '~/utils/function'
+import dayjs from 'dayjs'
 
 const { t } = useI18n()
 
@@ -175,17 +192,28 @@ const loading = ref(false)
 
 const selectedSession = ref<ISession | null>(null)
 
+const selectCourse = ref('all')
+
 const courseActiveOptions = computed(() => {
-  return courseList.value.filter((course) => {
+  const list = courseList.value.filter((course) => {
     const term = termList.value.find((term) => term.id === course.termId)
     return term?.status === EnumTermStatus.ACTIVE
   })
+
+  return [
+    { id: 'all', title: 'All' },
+    ...list.map((i) => {
+      return {
+        id: i.id,
+        title: i.title
+      }
+    })
+  ]
 })
 
 const getCourseDetails = (courseId: string) => {
   const course = courseList.value.find((course) => course.id === courseId)
   const term = termList.value.find((term) => term.id === course?.termId)
-  console.log(course)
   return {
     course: course || null,
     term: term || null
@@ -193,11 +221,22 @@ const getCourseDetails = (courseId: string) => {
 }
 
 const sessionActiveOptions = computed(() => {
-  return sessionList.value.filter((session) => {
-    const course = courseActiveOptions.value.find((course) => course.id === session.courseId)
+  const list = sessionList.value.filter((session) => {
+    const course = courseList.value
+      .filter((course) => {
+        const term = termList.value.find((term) => term.id === course.termId)
+        return term?.status === EnumTermStatus.ACTIVE
+      })
+      .find((course) => course.id === session.courseId)
     const term = termList.value.find((term) => term.id === course?.termId)
     return term?.status === EnumTermStatus.ACTIVE
   })
+
+  if (selectCourse.value == 'all') {
+    return list
+  } else {
+    return list.filter((i) => i.courseId == selectCourse.value)
+  }
 })
 
 const studentEnrollList = ref<IEnrollment[]>([])
@@ -213,10 +252,48 @@ const getCountAttendance = (sessionId: string) => {
   return attendanceList.value.filter((enrollment) => enrollment.sessionId === sessionId).length
 }
 
-const tempAttendance = ref<IAttendance[]>([])
+const countPresent = computed(() => {
+  return (
+    tempAttendance.value.filter(
+      (enrollment) =>
+        enrollment.sessionId === selectedSession.value?.id &&
+        enrollment.status == EnumAttendanceStatus.PRESENT
+    )?.length || 0
+  )
+})
+
+const countLate = computed(() => {
+  return (
+    tempAttendance.value.filter(
+      (enrollment) =>
+        enrollment.sessionId === selectedSession.value?.id &&
+        enrollment.status == EnumAttendanceStatus.LATE
+    )?.length || 0
+  )
+})
+
+const countExcuse = computed(() => {
+  return (
+    tempAttendance.value.filter(
+      (enrollment) =>
+        enrollment.sessionId === selectedSession.value?.id &&
+        enrollment.status == EnumAttendanceStatus.EXCUSED
+    )?.length || 0
+  )
+})
+
+const countAbsent = computed(() => {
+  return (
+    tempAttendance.value.filter(
+      (enrollment) =>
+        enrollment.sessionId === selectedSession.value?.id &&
+        enrollment.status == EnumAttendanceStatus.ABSENT
+    )?.length || 0
+  )
+})
 
 const getAttendanceDetails = (studentId: string) => {
-  const attendance = attendanceList.value.find(
+  const attendance = tempAttendance.value.find(
     (attendance) =>
       attendance.studentId === studentId && attendance.sessionId === selectedSession.value?.id
   )
@@ -226,26 +303,32 @@ const getAttendanceDetails = (studentId: string) => {
 const loadingList = ref(false)
 const onSelectSession = async (session: ISession) => {
   selectedSession.value = session
+  studentEnrollList.value = []
   loadingList.value = true
-  await sleep(1000)
+  await sleep(500)
   loadingList.value = false
   studentEnrollList.value = enrollmentList.value.filter(
     (enrollment) =>
       enrollment.courseId === selectedSession.value?.courseId &&
       enrollment.status == EnumEnrollmentStatus.ENROLLED
   )
+
+  tempAttendance.value = []
+  tempAttendance.value = [...attendanceList.value].map((item) => ({ ...item }))
 }
 
+const tempAttendance = ref<IAttendance[]>([])
+
 const updateAttendance = (item: IEnrollment, status: EnumAttendanceStatus) => {
-  const index = attendanceList.value.findIndex(
+  const index = tempAttendance.value.findIndex(
     (attendance) =>
       attendance.studentId === item.studentId && attendance.sessionId === selectedSession.value?.id
   )
 
   if (index !== -1) {
-    attendanceList.value[index].status = status
+    tempAttendance.value[index].status = status
   } else {
-    attendanceList.value.push({
+    tempAttendance.value.push({
       id: v4(),
       studentId: item.studentId,
       sessionId: selectedSession.value?.id || '',
@@ -255,11 +338,18 @@ const updateAttendance = (item: IEnrollment, status: EnumAttendanceStatus) => {
       recordedBy: ''
     })
   }
-
-  console.log(attendanceList.value)
 }
 
-const saveAttendance = () => {}
+const saveAttendance = () => {
+  const list = tempAttendance.value.map((i) => {
+    return {
+      ...i,
+      recordedAt: dayjs().toISOString()
+    }
+  })
+
+  attendanceList.value = structuredClone([...list])
+}
 
 onMounted(async () => {})
 </script>

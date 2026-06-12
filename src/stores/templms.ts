@@ -44,7 +44,6 @@ export interface ISession {
   title: string
   scheduledAt: string
   durationMinutes: number
-  location?: string
   status: EnumSessionStatus
 }
 
