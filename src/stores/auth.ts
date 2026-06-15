@@ -11,7 +11,7 @@ export const useAuthStore = defineStore(
     const router = useRouter()
     const roleStore = useRoleStore()
     const myProfileStore = useMyProfileStore()
-    const isAuthenticated = ref(false)
+    const isAuthenticated = ref(true)
     const accessToken = ref('')
     const refreshToken = ref('')
 
